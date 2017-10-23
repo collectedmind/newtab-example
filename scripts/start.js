@@ -14,7 +14,8 @@ process.on('unhandledRejection', err => {
 // Ensure environment variables are read.
 require('../config/env');
 
-const fs = require('fs');
+const fs = require('fs-extra');
+const path = require('path');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
@@ -35,13 +36,28 @@ const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
 
 // Warn and crash if required files are missing
-if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+if (!checkRequiredFiles([
+  paths.appBackground,
+  paths.appNewtabJS,
+  paths.appNewtabHTML,
+])) {
   process.exit(1);
 }
 
 // Tools like Cloud9 rely on this.
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
+
+// Empty the build directory
+fs.emptyDirSync(paths.appBuild)
+fs.copySync(paths.appPublic, paths.appBuild, { dereference: true })
+
+// Generate the manifest for a chrome extension
+const manifest = require(paths.appManifest)
+fs.writeFileSync(
+  path.join(paths.appBuild, 'manifest.json'),
+  JSON.stringify(manifest)
+)
 
 // We attempt to use the default port but if it is busy, we offer the user to
 // run on a different port. `detect()` Promise resolves to the next free port.

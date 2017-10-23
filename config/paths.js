@@ -52,4 +52,8 @@ module.exports = {
   appNodeModules: resolveApp('node_modules'),
   publicUrl: getPublicUrl(resolveApp('package.json')),
   servedPath: getServedPath(resolveApp('package.json')),
+  appBackground: resolveApp('src/background.js'),
+  appNewtabJS: resolveApp('src/newtab.js'),
+  appNewtabHTML: resolveApp('src/newtab.html'),
+  appManifest: resolveApp('src/manifest.json'),
 };
